@@ -207,4 +207,12 @@
         };
 
     }]);
+
+    dgMapsModule.service('geocoder', function() {
+        return {
+            get: function(query, options) {
+                return DG.Geocoder.get(query, options);
+            }
+        }
+    });
 })();
