@@ -9,4 +9,17 @@ function ExampleController($scope, $timeout, $log) {
 
     $scope.zoomControls = true;
     $scope.fullscreenControls = true;
+
+    $scope.markers = [
+        {
+            latitude: 55.028936234826,
+            longitude: 82.927810142519,
+            draggable: true,
+
+            dragStop: function(marker) {
+                var pos = marker.getPosition();
+                console.log('Marker drag stop: ' + pos.lon + ' ' + pos.lat);
+            }
+        }
+    ];
 }
