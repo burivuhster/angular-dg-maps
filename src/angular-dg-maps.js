@@ -21,7 +21,8 @@
                 zoom: "=zoom", // required
                 markers: "=markers", // optional
                 zoomControls: "=zoomControls",
-                fullscreenControls: "=fullscreenControls"
+                fullscreenControls: "=fullscreenControls",
+                fitToMarkers: "=fitToMarkers"
             },
             controller: controller,
             link: function(scope, element, attrs, ctrl) {
@@ -169,10 +170,17 @@
                 });
 
                 scope.$watch('markers', function(markers) {
-                    _m.markers.removeAll();
-                    angular.forEach(scope.markers, function(markerConfig) {
-                        scope.addMarker(markerConfig);
-                    })
+                    if(markers) {
+                        _m.markers.removeAll();
+                        angular.forEach(scope.markers, function(markerConfig) {
+                            scope.addMarker(markerConfig);
+                        });
+
+                        if(scope.fitToMarkers) {
+                            var markersBounds = _m.markers.getBounds();
+                            _m.setBounds(markersBounds);
+                        }
+                    }
                 }, true);
 
                 // Update model properties on map events
