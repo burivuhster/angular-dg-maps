@@ -85,9 +85,20 @@ dgMapsModule.directive("dgMap", ["$log", "$timeout", "$filter", "$rootScope", fu
                         markerDGConfig.dragStartCallback = markerConfig.dragStart;
                     }
 
-                    if(markerConfig.dragStop && typeof markerConfig.dragStop === "function") {
-                        markerDGConfig.dragStopCallback = markerConfig.dragStop;
+                    if(markerConfig.draggable) {
+                        markerDGConfig.dragStopCallback = function(evt) {
+                            var pos = evt.getPosition();
+                            scope.$apply(function() {
+                                markerConfig.latitude = pos.lat;
+                                markerConfig.longitude = pos.lon;
+                            });
+
+                            if(markerConfig.dragStop && typeof markerConfig.dragStop === "function") {
+                                markerConfig.dragStop.apply(this, arguments);
+                            }
+                        }
                     }
+
 
                     var marker = new DG.Markers.Common(markerDGConfig);
 
