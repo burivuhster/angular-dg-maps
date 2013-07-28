@@ -269,6 +269,17 @@
                 src += '&zoom=' + scope.zoom;
                 src += '&size=' + scope.width + ',' + scope.height;
 
+                if(angular.isDefined(scope.markers) && angular.isArray(scope.markers)) {
+                    var tmpMarkers = [];
+                    angular.forEach(scope.markers, function(marker) {
+                        if(angular.isArray(marker) && marker.length >=2) {
+                            tmpMarkers.push(marker.join(','));
+                        }
+                    });
+
+                    src += '&markers=' + tmpMarkers.join('~');
+                }
+
                 scope.mapSrc = src;
             }
         };
