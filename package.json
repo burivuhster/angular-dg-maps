@@ -1,28 +1,28 @@
 {
-    "name": "angular-dg-maps",
-    "version": "0.0.0",
-    "description": "Simple to use Angular.js component to work with 2GIS Maps API",
-    "directories": {
-        "example": "example"
-    },
-    "scripts": {
-        "test": "test"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/burivuhster/angular-dg-maps.git"
-    },
-    "keywords": [
-        "2gis",
-        "dg",
-        "angular"
-    ],
-    "devDependencies": {
-        "grunt": "~0.4.1",
-        "grunt-contrib-jshint": "~0.6.0",
-        "grunt-contrib-uglify": "~0.2.2"
-    },
-    "author": "burivuhster",
-    "license": "MIT",
-    "readmeFilename": "README.md"
+  "name": "angular-dg-maps",
+  "version": "0.0.0",
+  "description": "Simple to use Angular.js component to work with 2GIS Maps API",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/burivuhster/angular-dg-maps.git"
+  },
+  "keywords": [
+    "2gis",
+    "dg",
+    "angular"
+  ],
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-jshint": "~0.6.1",
+    "grunt-contrib-uglify": "~0.2.2"
+  },
+  "author": "burivuhster",
+  "license": "MIT",
+  "readmeFilename": "README.md"
 }

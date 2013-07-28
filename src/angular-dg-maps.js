@@ -88,7 +88,7 @@
                                 if (markerConfig.dragStop && typeof markerConfig.dragStop === "function") {
                                     markerConfig.dragStop.apply(this, arguments);
                                 }
-                            }
+                            };
                         }
 
 
@@ -220,6 +220,6 @@
             get: function(query, options) {
                 return DG.Geocoder.get(query, options);
             }
-        }
+        };
     });
 })();
