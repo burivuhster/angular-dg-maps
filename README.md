@@ -16,6 +16,19 @@ Before using angular-dg-maps you must include the main Angular.js library, the 2
 <script src="/path/to/your-angular-controller.js"></script>
 ```
 
+Another way is to use [Bower](http://bower.io):
+```
+bower install angular-dg-maps
+```
+
+Than you will be able to include angular-dg-maps like this:
+```html
+<script type="text/javascript" src="http://maps.api.2gis.ru/1.0"></script>
+<script src="bower_components/angular/angular.min.js"></script>
+<script src="bower_components/angular-dg-maps/build/angular-dg-maps.min.js"></script>
+<script src="/path/to/your-angular-controller.js"></script>
+```
+
 You will need to make your application's module depend on the `dg-maps` module:
 ```javascript
 var app = angular.module("myApp", ["dg-maps"]);
