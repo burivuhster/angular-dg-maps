@@ -46,12 +46,13 @@
 
         <p>Simple to use Angular.js component to work with <a href="http://api.2gis.ru/">2GIS Maps API</a></p>
         <hr/>
+        <a class="btn-large btn-primary btn" href="https://raw.github.com/burivuhster/angular-dg-maps/master/build/angular-dg-maps.min.js">Download</a>
         <a class="btn-large btn" href="http://github.com/burivuhster/angular-dg-maps">View on Github</a>
     </div>
 
     <h2>Try it!</h2>
 
-    <p>Feel free to play with examples below</p>
+    <p>Feel free to play with example below</p>
 
     <div class="row">
         <div class="span6">
@@ -123,15 +124,31 @@
     </div>
 
     <h2>Usage</h2>
-
+    <h3>Installation</h3>
     <p>
         Before using angular-dg-maps you must include the main Angular.js library, the 2GIS library and the
         angular-dg-maps.js script:
     </p>
         <pre class="prettyprint lang-html">&lt;script type=&quot;text/javascript&quot; src=&quot;http://maps.api.2gis.ru/1.0&quot;&gt;&lt;/script&gt;
 &lt;script src=&quot;http://ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min.js&quot;&gt;&lt;/script&gt;
-&lt;script src=&quot;/path/to/angular-dg-maps.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;/path/to/angular-dg-maps.min.js&quot;&gt;&lt;/script&gt;
 &lt;script src=&quot;/path/to/your-angular-controller.js&quot;&gt;&lt;/script&gt;</pre>
+
+    <h3>Installation with Bower</h3>
+    <p>
+        You can also install angular-dg-maps with <a href="http://bower.io/">Bower</a>:
+    </p>
+    <pre class="prettyprint lang-shell">bower install angular-dg-maps</pre>
+
+    <p>
+        Than you will be able to include it from your <code>bower_components</code> directory like this:
+    </p>
+    <pre class="prettyprint lang-html">&lt;script type=&quot;text/javascript&quot; src=&quot;http://maps.api.2gis.ru/1.0&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;bower_components/angular/angular.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;bower_components/angular-dg-maps/build/angular-dg-maps.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;/path/to/your-angular-controller.js&quot;&gt;&lt;/script&gt;</pre>
+
+    <h3>Dependency</h3>
     <p>
         You will need to make your application's module depend on the <code>dg-maps</code> module:
     </p>
