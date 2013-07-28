@@ -1,13 +1,18 @@
+/*!
+ * Angular-dg-maps.js
+ * http://burivuhster.github.io/angular-dg-maps
+ *
+ * Copyright 2013 Eugene Molodkin <burivuh@gmail.com>
+ * Released under the MIT license
+ * https://github.com/burivuhster/angular-dg-maps/blob/master/LICENSE
+ */
+
 (function() {
     'use strict';
 
     var dgMapsModule = angular.module("dg-maps", []);
 
     dgMapsModule.directive("dgMap", ["$log", "$timeout", "$filter", "$rootScope", function($log, $timeout, $filter, $rootScope) {
-
-        var controller = function() {
-
-        };
 
         return {
             restrict: "ECA",
@@ -25,7 +30,6 @@
                 fitToMarkers: "=",
                 draggable: "="
             },
-            controller: controller,
             link: function(scope, element, attrs, ctrl) {
 
                 if (!angular.isDefined(scope.zoom)) {

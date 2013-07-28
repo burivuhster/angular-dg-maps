@@ -1,6 +1,7 @@
 {
   "name": "angular-dg-maps",
-  "version": "0.0.0",
+  "version": "0.0.1",
+  "homepage": "http://burivuhster.github.io/angular-dg-maps",
   "description": "Simple to use Angular.js component to work with 2GIS Maps API",
   "directories": {
     "example": "example"
@@ -22,7 +23,7 @@
     "grunt-contrib-jshint": "~0.6.1",
     "grunt-contrib-uglify": "~0.2.2"
   },
-  "author": "burivuhster",
+  "author": "Eugene Molodkin <burivuh@gmail.com>",
   "license": "MIT",
   "readmeFilename": "README.md"
 }
