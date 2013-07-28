@@ -18,86 +18,59 @@
 
 </head>
 <body ng-controller="ExampleController" onload="prettyPrint()">
-    <div class="container">
-        <div class="hero-unit">
-            <h1>2GIS for Angular.js</h1>
-            <p>Simple to use Angular.js component to work with <a href="http://api.2gis.ru/">2GIS API</a></p>
-            <hr/>
-            <a class="btn-large btn" href="http://github.com/burivuhster/angular-dg-maps">View on Github</a>
-        </div>
-        <p>Here would be description</p>
-        <h2>Usage</h2>
-        <p>
-            Before using angular-dg-maps you must include the main Angular.js library, the 2GIS library and the angular-dg-maps.js script:
-        </p>
-        <pre class="prettyprint lang-html">&lt;script type=&quot;text/javascript&quot; src=&quot;http://maps.api.2gis.ru/1.0&quot;&gt;&lt;/script&gt;
-&lt;script src=&quot;http://ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min.js&quot;&gt;&lt;/script&gt;
-&lt;script src=&quot;/path/to/angular-dg-maps.js&quot;&gt;&lt;/script&gt;
-&lt;script src=&quot;/path/to/your-angular-controller.js&quot;&gt;&lt;/script&gt;</pre>
-        <p>
-            You will need to make your application's module depend on the <code>dg-maps</code> module:
-        </p>
-        <pre class="prettyprint lang-javascript">var app = angular.module("myApp", ["dg-maps"]);</pre>
-        <p>
-            Next, inside your controller, you'll need to define some properties required for the directive to work:
-        </p>
-        <pre class="prettyprint lang-javascript">angular.extend($scope, {
-    lat: 55.028936234826, // initial map center latitude
-    lon: 82.927810142519, // initial map center longitude
-    zoom: 15 // the zoom level
-});</pre>
-        <p>
-            Now, include the <code>&lt;dg-map&gt;</code> element in your template:
-        </p>
-        <pre class="prettyprint lang-html">&lt;dg-map latitude=&quot;lat&quot; longitude=&quot;lon&quot; zoom=&quot;zoom&quot; style=&quot;height: 500px; width: 500px;&quot;&gt;&lt;/dg-map&gt;</pre>
-        <h2>Try it!</h2>
-        <p>Feel free to play with this example</p>
-        <div class="row">
-            <div class="span6">
-                <form class="form-horizontal">
-                    <legend>Coordinates</legend>
-                    <div class="control-group">
-                        <label class="control-label" for="inputLat">Latitude</label>
-                        <div class="controls">
-                            <input type="number" id="inputLat" step="0.01" ng-model="lat">
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="inputLon">Longitude</label>
-                        <div class="controls">
-                            <input type="number" id="inputLon" step="0.01" ng-model="lon">
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="inputZoom">Zoom</label>
-                        <div class="controls">
-                            <input type="number" class="input-mini" id="inputZoom" ng-model="zoom" min="1" max="17">
-                        </div>
-                    </div>
+<div class="container">
+    <div class="hero-unit">
+        <h1>2GIS for Angular.js</h1>
+    </div>
 
-                    <legend>Controls</legend>
-                    <div class="control-group">
-                        <label class="control-label" for="inputLat">Zoom controls</label>
-                        <div class="controls">
-                            <div class="btn-group" data-toggle="buttons-radio">
-                                <button type="button" class="btn" ng-class="zoomControls && 'active btn-success'" ng-click="zoomControls=true">On</button>
-                                <button type="button" class="btn" ng-class="!zoomControls && 'active btn-danger'" ng-click="zoomControls=false">Off</button>
-                            </div>
+    <h2>Try it!</h2>
+    <p>Feel free to play with this example</p>
+    <div class="row">
+        <div class="span6">
+            <form class="form-horizontal">
+                <legend>Coordinates</legend>
+                <div class="control-group">
+                    <label class="control-label" for="inputLat">Latitude</label>
+                    <div class="controls">
+                        <input type="number" id="inputLat" step="0.01" ng-model="lat">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="inputLon">Longitude</label>
+                    <div class="controls">
+                        <input type="number" id="inputLon" step="0.01" ng-model="lon">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="inputZoom">Zoom</label>
+                    <div class="controls">
+                        <input type="number" class="input-mini" id="inputZoom" ng-model="zoom" min="1" max="17">
+                    </div>
+                </div>
+
+                <legend>Controls</legend>
+                <div class="control-group">
+                    <label class="control-label" for="inputLat">Zoom controls</label>
+                    <div class="controls">
+                        <div class="btn-group" data-toggle="buttons-radio">
+                            <button type="button" class="btn" ng-class="zoomControls && 'active btn-success'" ng-click="zoomControls=true">On</button>
+                            <button type="button" class="btn" ng-class="!zoomControls && 'active btn-danger'" ng-click="zoomControls=false">Off</button>
                         </div>
                     </div>
-                    <div class="control-group">
-                        <label class="control-label" for="inputLat">Fullscreen control</label>
-                        <div class="controls">
-                            <div class="btn-group" data-toggle="buttons-radio">
-                                <button type="button" class="btn" ng-class="fullscreenControls && 'active btn-success'" ng-click="fullscreenControls=true">On</button>
-                                <button type="button" class="btn" ng-class="!fullscreenControls && 'active btn-danger'" ng-click="fullscreenControls=false">Off</button>
-                            </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="inputLat">Fullscreen control</label>
+                    <div class="controls">
+                        <div class="btn-group" data-toggle="buttons-radio">
+                            <button type="button" class="btn" ng-class="fullscreenControls && 'active btn-success'" ng-click="fullscreenControls=true">On</button>
+                            <button type="button" class="btn" ng-class="!fullscreenControls && 'active btn-danger'" ng-click="fullscreenControls=false">Off</button>
                         </div>
                     </div>
-                </form>
-            </div>
-            <div class="span6">
-                <dg-map
+                </div>
+            </form>
+        </div>
+        <div class="span6">
+            <dg-map
                     id="myDgMap"
                     latitude="lat"
                     longitude="lon"
@@ -105,8 +78,34 @@
                     zoom-controls="zoomControls"
                     fullscreen-controls="fullscreenControls"
                     style="height: 500px; width: 500px"></dg-map>
-                </div>
         </div>
     </div>
+
+    <h2>Usage</h2>
+    <p>
+        Before using angular-dg-maps you must include the main Angular.js library, the 2GIS library and the angular-dg-maps.js script:
+    </p>
+        <pre class="prettyprint lang-html">&lt;script type=&quot;text/javascript&quot; src=&quot;http://maps.api.2gis.ru/1.0&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;http://ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;/path/to/angular-dg-maps.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;/path/to/your-angular-controller.js&quot;&gt;&lt;/script&gt;</pre>
+    <p>
+        You will need to make your application's module depend on the <code>dg-maps</code> module:
+    </p>
+    <pre class="prettyprint lang-javascript">var app = angular.module("myApp", ["dg-maps"]);</pre>
+    <p>
+        Next, inside your controller, you'll need to define some properties required for the directive to work:
+    </p>
+        <pre class="prettyprint lang-javascript">angular.extend($scope, {
+    lat: 55.028936234826, // initial map center latitude
+    lon: 82.927810142519, // initial map center longitude
+    zoom: 15 // the zoom level
+});</pre>
+    <p>
+        Now, include the <code>&lt;google-map&gt;</code> element in your template:
+    </p>
+    <pre class="prettyprint lang-html">&lt;dg-map latitude=&quot;lat&quot; longitude=&quot;lon&quot; zoom=&quot;zoom&quot; style=&quot;height: 500px; width: 500px;&quot;&gt;&lt;/dg-map&gt;</pre>
+</div>
 </body>
+
 </html>
