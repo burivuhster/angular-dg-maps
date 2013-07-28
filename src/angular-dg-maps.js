@@ -28,7 +28,8 @@
                 zoomControls: "=",
                 fullscreenControls: "=",
                 fitToMarkers: "=",
-                draggable: "="
+                draggable: "=",
+                geoclicker: "="
             },
             link: function(scope, element, attrs, ctrl) {
 
@@ -67,6 +68,10 @@
 
                 if(angular.isDefined(scope.draggable) && !scope.draggable) {
                     _m.disableDragging();
+                }
+
+                if(angular.isDefined(scope.geoclicker) && !scope.geoclicker) {
+                    _m.geoclicker.disable();
                 }
 
                 // Add marker utility function
