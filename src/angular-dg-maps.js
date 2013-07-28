@@ -16,13 +16,14 @@
             template: "<div class='angular-dg-map' ng-transclude></div>",
             replace: true,
             scope: {
-                latitude: "=latitude", // required
-                longitude: "=longitude", // required
-                zoom: "=zoom", // required
-                markers: "=markers", // optional
-                zoomControls: "=zoomControls",
-                fullscreenControls: "=fullscreenControls",
-                fitToMarkers: "=fitToMarkers"
+                latitude: "=", // required
+                longitude: "=", // required
+                zoom: "=", // required
+                markers: "=", // optional
+                zoomControls: "=",
+                fullscreenControls: "=",
+                fitToMarkers: "=",
+                draggable: "="
             },
             controller: controller,
             link: function(scope, element, attrs, ctrl) {
@@ -60,6 +61,10 @@
                     _m.fullscreen.disable();
                 }
 
+                if(angular.isDefined(scope.draggable) && !scope.draggable) {
+                    _m.disableDragging();
+                }
+
                 // Add marker utility function
                 scope.addMarker = function(markerConfig) {
                     if (markerConfig.latitude && markerConfig.longitude) {
@@ -80,10 +85,12 @@
                         if (markerConfig.draggable) {
                             markerDGConfig.dragStopCallback = function(evt) {
                                 var pos = evt.getPosition();
-                                scope.$apply(function() {
-                                    markerConfig.latitude = pos.lat;
-                                    markerConfig.longitude = pos.lon;
-                                });
+                                if(pos) {
+                                    scope.$apply(function() {
+                                        markerConfig.latitude = pos.lat;
+                                        markerConfig.longitude = pos.lon;
+                                    });
+                                }
 
                                 if (markerConfig.dragStop && typeof markerConfig.dragStop === "function") {
                                     markerConfig.dragStop.apply(this, arguments);
@@ -127,7 +134,7 @@
 
                 // Update map zoom when it changes
                 scope.$watch("zoom", function(newValue, oldValue) {
-                    if (newValue === oldValue) {
+                    if (newValue === oldValue || dragging) {
                         return;
                     }
 
@@ -161,6 +168,10 @@
                 });
 
                 scope.$watch('markers', function(markers) {
+                    if(dragging) {
+                        return;
+                    }
+
                     if(markers) {
                         _m.markers.removeAll();
                         angular.forEach(scope.markers, function(markerConfig) {
@@ -181,25 +192,22 @@
                             scope.zoom = evt.getZoom();
                         });
                     } else {
-                        scope.$eval(function() {
-                            scope.zoom = evt.getZoom();
-                        });
+                        scope.zoom = evt.getZoom();
                     }
                 });
 
                 _m.addEventListener(_m.getContainerId(), 'DgMapMove', function(evt) {
-                    if (!$rootScope.$root.$$phase) {
-                        scope.$apply(function() {
-                            var pos = evt.getCenter();
+                    var pos = evt.getCenter();
+                    if(pos) {
+                        if (!$rootScope.$root.$$phase) {
+                            scope.$apply(function() {
+                                scope.latitude = pos.lat;
+                                scope.longitude = pos.lon;
+                            });
+                        } else {
                             scope.latitude = pos.lat;
                             scope.longitude = pos.lon;
-                        });
-                    } else {
-                        scope.$eval(function() {
-                            var pos = evt.getCenter();
-                            scope.latitude = pos.lat;
-                            scope.longitude = pos.lon;
-                        });
+                        }
                     }
                 });
 
@@ -213,6 +221,53 @@
             }
         };
 
+    }]);
+
+    dgMapsModule.directive('dgStaticMap', ['$log', function($log) {
+        return {
+            restrict: "ECA",
+            priority: 100,
+            template: "<img class='angular-dg-static-map' ng-src='{{ mapSrc }}'>",
+            replace: true,
+            scope: {
+                latitude: "=", // required
+                longitude: "=", // required
+                zoom: "=", // required
+                width: "=", //required
+                height: "=", // required
+                markers: "=" // optional
+            },
+            link: function(scope, element, attrs, ctrl) {
+                if(!angular.isDefined(scope.latitude)) {
+                    $log.error("angular-dg-static-maps: map latitude property not set");
+                    return;
+                }
+
+                if(!angular.isDefined(scope.longitude)) {
+                    $log.error("angular-dg-static-maps: map longitude property not set");
+                    return;
+                }
+
+                if(!angular.isDefined(scope.markers) && !angular.isDefined(scope.zoom)) {
+                    $log.error("angular-dg-static-maps: map zoom property not set");
+                    return;
+                }
+
+                if(!angular.isDefined(scope.width) || !angular.isDefined(scope.height)) {
+                    $log.error("angular-dg-static-maps: width and height properties should be set");
+                    return;
+                }
+
+                angular.element(element).addClass("angular-dg-static-map");
+
+                var src = 'http://static.maps.api.2gis.ru/1.0?';
+                src += 'center=' + scope.longitude + ',' + scope.latitude;
+                src += '&zoom=' + scope.zoom;
+                src += '&size=' + scope.width + ',' + scope.height;
+
+                scope.mapSrc = src;
+            }
+        };
     }]);
 
     dgMapsModule.service('geocoder', function() {

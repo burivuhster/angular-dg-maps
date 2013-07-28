@@ -1,7 +1,7 @@
 [Angular 2GIS Maps](http://burivuhster.github.io/angular-dg-maps)
 ===============
 
-Angular-dg-maps is a directive that enables seamless integration of [2GIS Maps API](http://api.2gis.ru/doc/maps/info/) into your [AngularJS](https://github.com/angular/angular.js) app.
+Angular-dg-maps is a set of directives that enables seamless integration of [2GIS Maps API](http://api.2gis.ru/doc/maps/info/) into your [AngularJS](https://github.com/angular/angular.js) app.
 
 Check out docs here: http://burivuhster.github.io/angular-dg-maps
 
@@ -35,3 +35,15 @@ Now, include the `<dg-map>` element in your template:
 <dg-map latitude="lat" longitude="lon" zoom="zoom" style="height: 500px; width: 500px;"></dg-map>
 ```
 
+## Static Maps API
+You can also use [Static 2GIS Maps API](http://api.2gis.ru/doc/maps/static/) in your angular application.
+To insert static map into your page simply include the `dg-static-map` element in your template:
+```html
+<dg-static-map
+        latitude="55.058883"
+        longitude="82.911182"
+        zoom="15"
+        width="500"
+        height="500"></dg-static-map>
+```
+Please note, all attributes above are required.
