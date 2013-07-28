@@ -1,6 +1,6 @@
 {
   "name": "angular-dg-maps",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "homepage": "http://burivuhster.github.io/angular-dg-maps",
   "description": "Simple to use Angular.js component to work with 2GIS Maps API",
   "directories": {
