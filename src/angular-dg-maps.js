@@ -27,17 +27,6 @@
             controller: controller,
             link: function(scope, element, attrs, ctrl) {
 
-                // latitude and longitude must be specified
-//            if (!angular.isDefined(scope.latitude)) {
-//                $log.error("angular-dg-maps: could not find a valid latitude property");
-//                return;
-//            }
-//
-//            if (!angular.isDefined(scope.longitude)) {
-//                $log.error("angular-dg-maps: could not find a valid longitude property");
-//                return;
-//            }
-
                 if (!angular.isDefined(scope.zoom)) {
                     $log.error("angular-dg-maps: map zoom property not set");
                     return;
@@ -56,6 +45,8 @@
                 // Add zoom controls
                 var _zoom = new DG.Controls.Zoom();
                 _m.controls.add(_zoom);
+
+                var dragging = false;
 
                 if (!angular.isDefined(scope.zoomControls) || scope.zoomControls) {
                     _zoom.show();
@@ -119,7 +110,7 @@
 
                 // Update map when center coordinates change
                 scope.$watch("latitude", function(newValue, oldValue) {
-                    if (newValue === oldValue) {
+                    if (newValue === oldValue || dragging) {
                         return;
                     }
 
@@ -127,7 +118,7 @@
                 }, true);
 
                 scope.$watch("longitude", function(newValue, oldValue) {
-                    if (newValue === oldValue) {
+                    if (newValue === oldValue || dragging) {
                         return;
                     }
 
@@ -210,6 +201,14 @@
                             scope.longitude = pos.lon;
                         });
                     }
+                });
+
+                _m.addEventListener(_m.getContainerId(), 'DgDragStart', function() {
+                    dragging = true;
+                });
+
+                _m.addEventListener(_m.getContainerId(), 'DgDragStop', function() {
+                    dragging = false;
                 });
             }
         };
