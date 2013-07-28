@@ -32,7 +32,11 @@ angular.extend($scope, {
 
 Now, include the `<dg-map>` element in your template:
 ```html
-<dg-map latitude="lat" longitude="lon" zoom="zoom" style="height: 500px; width: 500px;"></dg-map>
+<dg-map 
+        latitude="lat" 
+        longitude="lon" 
+        zoom="zoom" 
+        style="height: 500px; width: 500px;"></dg-map>
 ```
 
 ## Static Maps API
