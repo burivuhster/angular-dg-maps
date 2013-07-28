@@ -1,7 +1,11 @@
-Angular 2GIS Maps
+[Angular 2GIS Maps](http://burivuhster.github.io/angular-dg-maps)
 ===============
 
 Angular-dg-maps is a directive that enables seamless integration of [2GIS Maps API](http://api.2gis.ru/doc/maps/info/) into your [AngularJS](https://github.com/angular/angular.js) app.
+
+Check out docs here: http://burivuhster.github.io/angular-dg-maps
+
+Pull-requests are welcome!
 
 # Usage
 Before using angular-dg-maps you must include the main Angular.js library, the 2GIS library and the angular-dg-maps.js script:
