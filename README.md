@@ -39,7 +39,12 @@ Next, inside your controller, you'll need to define some properties required for
 angular.extend($scope, {
     lat: 55.028936234826, // initial map center latitude
     lon: 82.927810142519, // initial map center longitude
-    zoom: 15 // the zoom level
+    zoom: 15,   // the zoom level
+    marks: [{   
+        longitude: 37.64272,
+        latitude: 55.7368,
+        hint: "hm, 99"
+    }];
 });
 ```
 
@@ -49,6 +54,7 @@ Now, include the `<dg-map>` element in your template:
         latitude="lat" 
         longitude="lon" 
         zoom="zoom" 
+        markers="marks" 
         style="height: 500px; width: 500px;"></dg-map>
 ```
 
@@ -61,6 +67,7 @@ To insert static map into your page simply include the `dg-static-map` element i
         longitude="82.911182"
         zoom="15"
         width="500"
+        markers="[[37.64272,55.7368,99],[37.632618,55.7361]]"
         height="500"></dg-static-map>
 ```
 Please note, all attributes above are required.
