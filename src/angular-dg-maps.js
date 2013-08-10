@@ -52,7 +52,7 @@
 
     var dgMapsModule = angular.module("dg-maps", []);
 
-    dgMapsModule.directive("dgMap", ["$log", "$timeout", "$filter", "$rootScope", function($log, $timeout, $filter, $rootScope) {
+    dgMapsModule.directive("dgMap", ["$log", "$timeout", "$rootScope", function($log, $timeout, $rootScope) {
 
         var innerMapEl = angular.element('<div class="inner-dg-map" style="height: 100%; width: 100%;"></div>');
 
@@ -73,7 +73,7 @@
                 draggable: "=",
                 geoclicker: "="
             },
-            controller: function($scope) {
+            controller: ['$scope', function($scope) {
 
                 this._markers = [];
 
@@ -109,7 +109,7 @@
                     $log.error("angular-dg-maps: error while removing marker - marker not found");
                 };
 
-            },
+            }],
 
             compile: function(tElem) {
                 tElem.append(innerMapEl.attr('id', 'map' + Math.round(Math.random() * 1000000)));
@@ -267,7 +267,7 @@
 
     }]);
 
-    dgMapsModule.directive("dgMarker", [function($log, $timeout, $filter, $rootScope) {
+    dgMapsModule.directive("dgMarker", ["$log", function($log) {
         return {
             restrict: "E",
             require: "^dgMap",
@@ -397,7 +397,7 @@
                 width: "=", //required
                 height: "=" // required
             },
-            controller: function($scope) {
+            controller: ['$scope', function($scope) {
                 $scope.markers = [];
 
                 /**
@@ -415,7 +415,7 @@
                         }
                     });
                 };
-            },
+            }],
             link: function(scope, element, attrs) {
                 if(!angular.isDefined(scope.latitude)) {
                     $log.error("angular-dg-static-maps: map latitude property not set");
