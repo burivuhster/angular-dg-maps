@@ -12,14 +12,18 @@ function ExampleController($scope, $timeout, $log) {
 
     $scope.markers = [
         {
-            latitude: 55.028936234826,
-            longitude: 82.927810142519,
-            draggable: true,
-
-            dragStop: function(marker) {
-                var pos = marker.getPosition();
-                console.log('Marker drag stop: ' + pos.lon + ' ' + pos.lat);
-            }
+            lat: 55.028936234826,
+            lon: 82.927810142519,
+            hint: 'marker1'
+        },
+        {
+            lat: 55.027952323826,
+            lon: 82.91768212128,
+            hint: 'marker2'
         }
     ];
+
+    $scope.alert = function(text) {
+        alert(text);
+    }
 }

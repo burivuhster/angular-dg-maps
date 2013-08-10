@@ -4,7 +4,7 @@
     <title>Angular 2GIS Map Demo</title>
 
     <script type="text/javascript" src="http://maps.api.2gis.ru/1.0"></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.js"></script>
     <script type="text/javascript" src="../src/angular-dg-maps.js"></script>
     <script type="text/javascript" src="example-controller.js"></script>
 
@@ -16,14 +16,26 @@
         longitude="lon"
         zoom="zoom"
         geoclicker="true"
-        style="height: 500px; "></dg-map>
+        style="height: 500px;">
+
+    <dg-marker ng-repeat="marker in markers"
+               latitude="marker.lat"
+               longitude="marker.lon"
+               hint="marker.hint"
+               draggable="true"
+               ng-click="alert($index)"></dg-marker>
+        </dg-map>
 <br/>
-<dg-static-map
-        latitude="55.058883"
-        longitude="82.911182"
-        zoom="15"
-        markers="[[82.911182, 55.058883, 10], [82.913182, 55.056883]]"
-        width="500"
-        height="500"></dg-static-map>
+<span ng-repeat="marker in markers">
+<input  ng-model="marker.lon"><input ng-model="marker.lat "><br/>
+    </span>
+
+<!--<dg-static-map-->
+        <!--latitude="55.058883"-->
+        <!--longitude="82.911182"-->
+        <!--zoom="15"-->
+        <!--markers="[[82.911182, 55.058883, 10], [82.913182, 55.056883]]"-->
+        <!--width="500"-->
+        <!--height="500"></dg-static-map>-->
 </body>
 </html>
