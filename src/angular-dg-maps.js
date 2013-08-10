@@ -107,7 +107,7 @@
                     }
 
                     $log.error("angular-dg-maps: error while removing marker - marker not found");
-                }
+                };
 
             },
 
@@ -350,7 +350,11 @@
                         return;
                     }
 
-                    show ? marker.show() : marker.hide();
+                    if(show) {
+                        marker.show();
+                    } else {
+                        marker.hide();
+                    }
                 });
 
                 scope.$watch('hint', function(hint) {
@@ -365,12 +369,17 @@
                     if(!angular.isDefined(draggable)) {
                         return;
                     }
-                    draggable ? marker.enableDraggable() : marker.disableDraggable();
+
+                    if(draggable) {
+                        marker.enableDraggable();
+                    } else {
+                        marker.disableDraggable();
+                    }
                 });
 
                 element.bind('$destroy', function() {
                     dgMapCtrl.removeMarker(marker);
-                })
+                });
             }
         };
     }]);
