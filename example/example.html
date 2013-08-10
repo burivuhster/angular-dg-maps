@@ -10,32 +10,51 @@
 
 </head>
 <body ng-controller="ExampleController">
-<dg-map
-        id="myDgMap"
-        latitude="lat"
-        longitude="lon"
-        zoom="zoom"
-        geoclicker="true"
-        style="height: 500px;">
+    <dg-map
+            id="myDgMap"
+            latitude="lat"
+            longitude="lon"
+            zoom="zoom"
+            geoclicker="true"
+            style="height: 500px;">
 
-    <dg-marker ng-repeat="marker in markers"
-               latitude="marker.lat"
-               longitude="marker.lon"
-               hint="marker.hint"
-               draggable="true"
-               ng-click="alert($index)"></dg-marker>
-        </dg-map>
-<br/>
-<span ng-repeat="marker in markers">
-<input  ng-model="marker.lon"><input ng-model="marker.lat "><br/>
+        <dg-marker ng-repeat="marker in markers"
+                   latitude="marker.lat"
+                   longitude="marker.lon"
+                   hint="marker.hint"
+                   draggable="true"
+                   ng-click="alert($index)">
+        </dg-marker>
+    </dg-map>
+    <br/>
+
+    <span ng-repeat="marker in markers">
+        <input ng-model="marker.lon">
+        <input ng-model="marker.lat ">
+        <input ng-model="marker.hint">
+        <button ng-click="markers.splice($index,1)">Delete</button><br/>
     </span>
 
-<!--<dg-static-map-->
-        <!--latitude="55.058883"-->
-        <!--longitude="82.911182"-->
-        <!--zoom="15"-->
-        <!--markers="[[82.911182, 55.058883, 10], [82.913182, 55.056883]]"-->
-        <!--width="500"-->
-        <!--height="500"></dg-static-map>-->
+    <button ng-click="markers.push({ lon: 82.92467732239, lat:55.025640037891, hint:'new one'})">Add one</button>
+
+<br/><br/>
+
+    <dg-static-map
+            latitude="55.058883"
+            longitude="82.911182"
+            zoom="15"
+            width="500"
+            height="500">
+
+        <dg-static-marker
+                    latitude="55.058883"
+                    longitude="82.911182"
+                    hint="10"></dg-static-marker>
+
+        <dg-static-marker
+                latitude="55.056883"
+                longitude="82.913182"></dg-static-marker>
+
+    </dg-static-map>
 </body>
 </html>
