@@ -62,14 +62,14 @@
                     <label class="control-label" for="inputLat">Latitude</label>
 
                     <div class="controls">
-                        <input type="number" id="inputLat" step="0.01" ng-model="lat">
+                        <input type="number" id="inputLat" step="0.001" ng-model="lat">
                     </div>
                 </div>
                 <div class="control-group">
                     <label class="control-label" for="inputLon">Longitude</label>
 
                     <div class="controls">
-                        <input type="number" id="inputLon" step="0.01" ng-model="lon">
+                        <input type="number" id="inputLon" step="0.001" ng-model="lon">
                     </div>
                 </div>
                 <div class="control-group">
@@ -82,7 +82,7 @@
 
                 <legend>Controls</legend>
                 <div class="control-group">
-                    <label class="control-label" for="inputLat">Zoom controls</label>
+                    <label class="control-label">Zoom controls</label>
 
                     <div class="controls">
                         <div class="btn-group" data-toggle="buttons-radio">
@@ -96,7 +96,7 @@
                     </div>
                 </div>
                 <div class="control-group">
-                    <label class="control-label" for="inputLat">Fullscreen control</label>
+                    <label class="control-label">Fullscreen control</label>
 
                     <div class="controls">
                         <div class="btn-group" data-toggle="buttons-radio">
@@ -109,6 +109,24 @@
                         </div>
                     </div>
                 </div>
+
+                <legend>Markers</legend>
+
+                <div ng-repeat="marker in markers" class="control-group">
+                    <label class="control-label">Coordintes</label>
+
+                    <div class="controls">
+                        <input type="number" class="input-small" step="0.001" ng-model="marker.latitude">
+                        <input type="number" class="input-small" step="0.001" ng-model="marker.longitude">
+                        <a href="javascript:void(0)" ng-click="markers.splice($index, 1)"> <i class="icon-remove"></i> </a>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <div class="controls">
+                        <a class="btn" ng-click="markers.push({latitude: 55.026, longitude: 82.929, hint: 'new one'})">Add marker</a>
+                    </div>
+                </div>
+
             </form>
         </div>
         <div class="span6">
@@ -119,7 +137,10 @@
                     zoom="zoom"
                     zoom-controls="zoomControls"
                     fullscreen-controls="fullscreenControls"
-                    style="height: 500px; width: 500px"></dg-map>
+                    draggable="draggable"
+                    style="height: 500px; width: 500px">
+                <dg-marker ng-repeat="marker in markers" latitude="marker.latitude" longitude="marker.longitude" draggable="marker.draggable" ng-click="marker.onClick($index)" hint="marker.hint"></dg-marker>
+                    </dg-map>
         </div>
     </div>
 
@@ -161,10 +182,25 @@
     lon: 82.927810142519, // initial map center longitude
     zoom: 15 // the zoom level
 });</pre>
+
+    <h3>Map</h3>
     <p>
         Now, include the <code>&lt;dg-map&gt;</code> element in your template:
     </p>
     <pre class="prettyprint lang-html">&lt;dg-map latitude=&quot;lat&quot; longitude=&quot;lon&quot; zoom=&quot;zoom&quot; style=&quot;height: 500px; width: 500px;&quot;&gt;&lt;/dg-map&gt;</pre>
+
+    <h3>Markers</h3>
+    <p>
+        You can put markers on your map by adding <code>&lt;dg-marker&gt;</code> elements as children of <code>&lt;dg-map&gt;</code> element:
+    </p>
+    <pre class="prettyprint lang-html">&lt;dg-map latitude=&quot;lat&quot; longitude=&quot;lon&quot; zoom=&quot;zoom&quot; style=&quot;height: 500px; width: 500px;&quot;&gt;
+        &lt;dg-marker latitude=&quot;markerLat&quot; longitude=&quot;markerLon&quot;&gt;&lt;/dg-marker&gt;
+    &lt;/dg-map&gt;</pre>
+    <p>Or using <code>ng-repeat</code> directive:</p>
+    <pre class="prettyprint lang-html">&lt;dg-map latitude=&quot;lat&quot; longitude=&quot;lon&quot; zoom=&quot;zoom&quot; style=&quot;height: 500px; width: 500px;&quot;&gt;
+        &lt;dg-marker ng-repeat=&quot;marker in markers&quot; latitude=&quot;marker.latitude&quot; longitude=&quot;marker.longitude&quot; hint=&quot;marker.hint&quot;&gt;&lt;/dg-marker&gt;
+    &lt;/dg-map&gt;</pre>
+
 
     <h2>Static Map API</h2>
 
@@ -178,25 +214,22 @@
             latitude=&quot;{{ staticLat }}&quot;
             longitude=&quot;{{ staticLon }}&quot;
             zoom=&quot;{{ staticZoom }}&quot;
-            markers=&quot;{{ staticMarkers }}&quot;
             width=&quot;500&quot;
             height=&quot;500&quot;
             &gt;&lt;/dg-static-map&gt;</pre>
     <p>
     <p>
-        You can also bind attribute values to current scope properties, as it's done on this page:
+        You can also bind attribute values to current scope properties and add some markers, as it's done on this page:
     </p>
     <pre class="prettyprint lang-html">&lt;dg-static-map
             latitude=&quot;staticLat&quot;
             longitude=&quot;staticLon&quot;
             zoom=&quot;staticZoom&quot;
-            markers=&quot;staticMarkers&quot;
             width=&quot;500&quot;
-            height=&quot;500&quot;
-            &gt;&lt;/dg-static-map&gt;</pre>
-    <p>
-        <code>markers</code> attribute is optional. If you want to add markers on your static map, markers should be array of arrays for each marker.
-    </p>
+            height=&quot;500&quot;&gt;
+        &lt;dg-static-marker latitude=&quot;55.7368&quot; longitude=&quot;37.64272&quot;&gt;&lt;/dg-static-marker&gt;
+        &lt;dg-static-marker latitude=&quot;55.7361&quot; longitude=&quot;37.632618&quot; hint=&quot;10&quot;&gt;&lt;/dg-static-marker&gt;
+    &lt;/dg-static-map&gt;</pre>
     <p>
         <span class="label label-info">Important</span> Do not forget to set width and height attributes!
     </p>
@@ -228,12 +261,6 @@
                     </div>
                 </div>
 
-                <legend>Markers</legend>
-                <div class="control-group">
-                    <ul>
-                        <li ng-repeat="marker in staticMarkers">{{ marker | json }}</li>
-                    </ul>
-                </div>
             </form>
         </div>
         <div class="span6">
@@ -241,10 +268,12 @@
                     latitude="staticLat"
                     longitude="staticLon"
                     zoom="staticZoom"
-                    markers="staticMarkers"
                     width="500"
                     height="500"
-                    ></dg-static-map>
+                    >
+                    <dg-static-marker latitude="55.7368" longitude="37.64272"></dg-static-marker>
+                    <dg-static-marker latitude="55.7361" longitude="37.632618" hint="10"></dg-static-marker>
+                </dg-static-map>
         </div>
     </div>
 </div>
