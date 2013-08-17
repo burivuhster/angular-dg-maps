@@ -8,6 +8,7 @@ Check out docs here: http://burivuhster.github.io/angular-dg-maps
 Pull-requests are welcome!
 
 # Usage
+## Installation
 Before using angular-dg-maps you must include the main Angular.js library, the 2GIS library and the angular-dg-maps.js script:
 ```html
 <script type="text/javascript" src="http://maps.api.2gis.ru/1.0"></script>
@@ -29,11 +30,13 @@ Than you will be able to include angular-dg-maps like this:
 <script src="/path/to/your-angular-controller.js"></script>
 ```
 
+## Dependency
 You will need to make your application's module depend on the `dg-maps` module:
 ```javascript
 var app = angular.module("myApp", ["dg-maps"]);
 ```
 
+## Controller
 Next, inside your controller, you'll need to define some properties required for the directive to work:
 ```javascript
 angular.extend($scope, {
@@ -43,6 +46,7 @@ angular.extend($scope, {
 });
 ```
 
+## Map
 Now, include the `<dg-map>` element in your template:
 ```html
 <dg-map 
@@ -50,6 +54,18 @@ Now, include the `<dg-map>` element in your template:
         longitude="lon" 
         zoom="zoom" 
         style="height: 500px; width: 500px;"></dg-map>
+```
+
+## Markers
+You can put markers on your map by adding `<dg-marker>` elements as children of `<dg-map>` element:
+```html
+<dg-map latitude="lat" longitude="lon" zoom="zoom" style="height: 500px; width: 500px;">
+    <dg-marker 
+        ng-repeat="marker in markers" 
+        latitude="marker.latitude" 
+        longitude="marker.longitude" 
+        hint="marker.hint"></dg-marker>
+</dg-map>
 ```
 
 ## Static Maps API
@@ -64,3 +80,17 @@ To insert static map into your page simply include the `dg-static-map` element i
         height="500"></dg-static-map>
 ```
 Please note, all attributes above are required.
+
+## Static map markers
+Use `dg-static-marker` elements to add markers on your static map:
+```html
+<dg-static-map
+        latitude="staticLat"
+        longitude="staticLon"
+        zoom="staticZoom"
+        width="500"
+        height="500">
+        <dg-static-marker latitude="55.7368" longitude="37.64272"></dg-static-marker>
+        <dg-static-marker latitude="55.7361" longitude="37.632618" hint="10"></dg-static-marker>
+</dg-static-map>
+```
