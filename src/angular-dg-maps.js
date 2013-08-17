@@ -423,7 +423,7 @@
             priority: 100,
             require: '^dgStaticMap',
             link: function(scope, element, attrs, ctrl) {
-                if('hint' in attrs && (!angular.isNumber(parseInt(attrs.hint)) || parseInt(attrs.hint) != attrs.hint)) {
+                if('hint' in attrs && (!angular.isNumber(parseInt(attrs.hint, 10)) || parseInt(attrs.hint, 10) != attrs.hint)) {
                         $log.error('angular-dg-static-marker: hint should be a number');
                     return;
                 }
@@ -431,7 +431,7 @@
                 ctrl.addMarker({
                     lon: attrs.longitude,
                     lat: attrs.latitude,
-                    hint: parseInt(attrs.hint)
+                    hint: parseInt(attrs.hint, 10)
                 });
             }
         };
