@@ -10,46 +10,6 @@
 (function() {
     'use strict';
 
-    // Add marker utility function
-    function addMarker(markerConfig) {
-        if (markerConfig.latitude && markerConfig.longitude) {
-            var markerDGConfig = {
-                geoPoint: new DG.GeoPoint(markerConfig.longitude, markerConfig.latitude),
-                draggable: !!markerConfig.draggable,
-                hint: markerConfig.hint || ""
-            };
-
-            if (markerConfig.click && typeof markerConfig.click === "function") {
-                markerDGConfig.clickCallback = markerConfig.click;
-            }
-
-            if (markerConfig.dragStart && typeof markerConfig.dragStart === "function") {
-                markerDGConfig.dragStartCallback = markerConfig.dragStart;
-            }
-
-            if (markerConfig.draggable) {
-                markerDGConfig.dragStopCallback = function(evt) {
-                    var pos = evt.getPosition();
-                    if(pos) {
-                        scope.$apply(function() {
-                            markerConfig.latitude = pos.lat;
-                            markerConfig.longitude = pos.lon;
-                        });
-                    }
-
-                    if (markerConfig.dragStop && typeof markerConfig.dragStop === "function") {
-                        markerConfig.dragStop.apply(this, arguments);
-                    }
-                };
-            }
-
-
-            var marker = new DG.Markers.Common(markerDGConfig);
-
-            _m.markers.add(marker);
-        }
-    }
-
     var dgMapsModule = angular.module("dg-maps", []);
 
     dgMapsModule.directive("dgMap", ["$log", "$timeout", "$rootScope", function($log, $timeout, $rootScope) {
@@ -66,7 +26,6 @@
                 latitude: "=", // required
                 longitude: "=", // required
                 zoom: "=", // required
-                markers: "=", // optional
                 zoomControls: "=",
                 fullscreenControls: "=",
                 fitToMarkers: "=",
@@ -458,20 +417,25 @@
         };
     }]);
 
-    dgMapsModule.directive('dgStaticMarker', function() {
+    dgMapsModule.directive('dgStaticMarker', ['$log', function($log) {
         return {
             restrict: 'E',
             priority: 100,
             require: '^dgStaticMap',
             link: function(scope, element, attrs, ctrl) {
+                if('hint' in attrs && (!angular.isNumber(parseInt(attrs.hint)) || parseInt(attrs.hint) != attrs.hint)) {
+                        $log.error('angular-dg-static-marker: hint should be a number');
+                    return;
+                }
+
                 ctrl.addMarker({
                     lon: attrs.longitude,
                     lat: attrs.latitude,
-                    hint: attrs.hint
+                    hint: parseInt(attrs.hint)
                 });
             }
         };
-    });
+    }]);
 
     dgMapsModule.service('geocoder', function() {
         return {
