@@ -8,440 +8,379 @@
  */
 
 (function() {
-    'use strict';
+	'use strict';
 
-    var dgMapsModule = angular.module("dg-maps", []);
+	var dgMapsModule = angular.module("dg-maps", []);
 
-    dgMapsModule.directive("dgMap", ["$log", "$timeout", "$rootScope", function($log, $timeout, $rootScope) {
+	dgMapsModule.directive("dgMap", ["$log", "$timeout", "$rootScope", function($log, $timeout, $rootScope) {
 
-        var innerMapEl = angular.element('<div class="inner-dg-map" style="height: 100%; width: 100%;"></div>');
+		var innerMapEl = angular.element('<div class="inner-dg-map" style="height: 100%; width: 100%;"></div>');
 
-        return {
-            restrict: "E",
-            priority: 100,
-            transclude: true,
-            template: "<div class='angular-dg-map'> <dg-markers ng-transclude></dg-markers></div>",
-            replace: true,
-            scope: {
-                latitude: "=", // required
-                longitude: "=", // required
-                zoom: "=", // required
-                zoomControls: "=",
-                fullscreenControls: "=",
-                fitToMarkers: "=",
-                draggable: "=",
-                geoclicker: "="
-            },
-            controller: ['$scope', function($scope) {
+		return {
+			restrict: "E",
+			priority: 100,
+			transclude: true,
+			template: "<div class='angular-dg-map'> <dg-markers ng-transclude></dg-markers></div>",
+			replace: true,
+			scope: {
+				latitude: "=", // required
+				longitude: "=", // required
+				zoom: "=", // required
+				zoomControls: "=",
+				fullscreenControls: "=",
+				fitToMarkers: "=",
+				draggable: "=",
+				geoclicker: "="
+			},
+			controller: ['$scope', function($scope) {
 
-                this._markers = [];
+				this._markers = [];
 
-                /**
-                 * Add marker
-                 * @param {DG.Marker} marker
-                 */
-                this.addMarker = function(marker) {
-                    this._markers.push(marker);
+				/**
+				 * Add marker
+				 * @param {DG.Marker} marker
+				 */
+				this.addMarker = function(marker, tries){
+					this._markers.push(marker);
+					
+					tries = tries || 1;
+					
+					if (!$scope.map && tries < 5) {
+						return $timeout(
+								(function (self, marker, tries) {
+									return function ()
+									{
+										self.addMarker(marker, tries);
+									};
+								})(this, marker, tries++),
+								500
+								);
+					}
 
-                    // If map is already initialized
-                    if($scope.map) {
-                        $scope.map.markers.add(marker);
-                    }
-                };
+					// If map is already initialized
+					if($scope.map) {
+						marker.addTo($scope.map);
+					}
+				};
 
-                /**
-                 * Remove marker from map
-                 * @param {DG.Marker} marker
-                 */
-                this.removeMarker = function(marker) {
-                    if($scope.map) {
-                        $scope.map.markers.remove(marker);
-                    }
+				/**
+				 * Remove marker from map
+				 * @param {DG.Marker} marker
+				 */
+				this.removeMarker = function(marker) {
+					if($scope.map) {
+						marker.removeFrom($scope.map);
+					}
+					
+					var index = this._markers.indexOf(marker);
+					if(index !== -1){
+						return this._markers.splice(i, 1);
+					}
 
-                    for(var i = 0; i < this._markers.length; i++) {
-                        if(this._markers[i] === marker) {
-                            this._markers.splice(i, 1);
-                            return;
-                        }
-                    }
+					$log.error("angular-dg-maps: error while removing marker - marker not found");
+				};
 
-                    $log.error("angular-dg-maps: error while removing marker - marker not found");
-                };
+			}],
 
-            }],
+			compile: function(tElem) {
+				tElem.append(innerMapEl.attr('id', 'map' + Math.round(Math.random() * 1000000)));
+				return this.link;
+			},
 
-            compile: function(tElem) {
-                tElem.append(innerMapEl.attr('id', 'map' + Math.round(Math.random() * 1000000)));
-                return this.link;
-            },
+			link: function(scope, element, attrs, ctrl) {
+				if (!angular.isDefined(scope.zoom)) {
+					$log.error("angular-dg-maps: map zoom property not set");
+					return;
+				}
+				
+				DG.then(function () {
+					
+					var mapParams = {
+						zoom: scope.zoom,
+						fullscreenControl:false,
+						zoomControl:false
+					};
+					
+					// Set map center and zoom
+					if (angular.isDefined(scope.latitude) && angular.isDefined(scope.longitude)) {
+						angular.extend(mapParams, {center:[scope.latitude, scope.longitude]});
+					}
+					
+					if(angular.isDefined(scope.draggable) && !scope.draggable) {
+						angular.extend(mapParams, {dragging:false});
+					}
+					
+					if(angular.isDefined(scope.geoclicker)){
+						angular.extend(mapParams, {geoclicker:scope.geoclicker});
+					}
+					
+					// Create DG Map object
+					var _m = new DG.map(innerMapEl.attr('id'), mapParams),
+					// Create DG Controls
+						_zoomControll       = new DG.Control.Zoom(),
+						_fullscreenControll = new DG.Control.Fullscreen();
+					
+					if (!angular.isDefined(scope.zoomControls) || scope.zoomControls) {
+						_zoomControll.addTo(_m);
+					}
+					
+					if (!angular.isDefined(scope.fullscreenControls) || scope.fullscreenControls) {
+						_fullscreenControll.addTo(_m);
+					}
+					
+					var dragging = false;
 
-            link: function(scope, element, attrs, ctrl) {
-                if (!angular.isDefined(scope.zoom)) {
-                    $log.error("angular-dg-maps: map zoom property not set");
-                    return;
-                }
+					// Put the map into the scope
+					scope.map = _m;
 
-                // Create DG Map object
-                var _m = new DG.Map(innerMapEl.attr('id'));
+					// Update map when center coordinates change
+					scope.$watch("latitude", function(newValue, oldValue) {
+						if (newValue === oldValue || dragging) {
+							return;
+						}
 
-                // Set map center and zoom
-                if (angular.isDefined(scope.latitude) && angular.isDefined(scope.longitude)) {
-                    _m.setCenter(new DG.GeoPoint(scope.longitude, scope.latitude), scope.zoom);
-                }
+						_m.panTo([newValue, scope.longitude]);
+					}, true);
 
-                // Add zoom controls
-                var _zoom = new DG.Controls.Zoom();
-                _m.controls.add(_zoom);
+					scope.$watch("longitude", function(newValue, oldValue) {
+						if (newValue === oldValue || dragging) {
+							return;
+						}
 
-                var dragging = false;
+						_m.panTo([scope.latitude, newValue]);
+					}, true);
 
-                if (!angular.isDefined(scope.zoomControls) || scope.zoomControls) {
-                    _zoom.show();
-                } else {
-                    _zoom.hide();
-                }
+					// Update map zoom when it changes
+					scope.$watch("zoom", function(newValue, oldValue) {
+						if (newValue === oldValue || dragging) {
+							return;
+						}
 
-                if (!angular.isDefined(scope.fullscreenControls) || scope.fullscreenControls) {
-                    _m.fullscreen.enable();
-                } else {
-                    _m.fullscreen.disable();
-                }
+						_m.setZoom(newValue);
+					}, true);
 
-                if(angular.isDefined(scope.draggable) && !scope.draggable) {
-                    _m.disableDragging();
-                }
+					// Update zoom controls visibility when model changes
+					scope.$watch('zoomControls', function(newValue, oldValue) {
+						if (newValue === oldValue) {
+							return;
+						}
 
-                if(angular.isDefined(scope.geoclicker) && !scope.geoclicker) {
-                    _m.geoclicker.disable();
-                }
+						if (newValue) {
+							_zoomControll.addTo(_m);
+						} else {
+							_zoomControll.removeFrom(_m);
+						}
+					});
 
-                // Put the map into the scope
-                scope.map = _m;
+					// Update fulscreen control visibility when model changes
+					scope.$watch('fullscreenControls', function(newValue, oldValue) {
+						if (newValue === oldValue) {
+							return;
+						}
 
-                // Update map when center coordinates change
-                scope.$watch("latitude", function(newValue, oldValue) {
-                    if (newValue === oldValue || dragging) {
-                        return;
-                    }
+						if (newValue) {
+							_fullscreenControll.addTo(_m);
+						} else {
+							_fullscreenControll.removeFrom(_m);
+						}
+					});
 
-                    _m.setCenter(new DG.GeoPoint(scope.longitude, newValue), scope.zoom);
-                }, true);
-
-                scope.$watch("longitude", function(newValue, oldValue) {
-                    if (newValue === oldValue || dragging) {
-                        return;
-                    }
-
-                    _m.setCenter(new DG.GeoPoint(newValue, scope.latitude), scope.zoom);
-                }, true);
-
-                // Update map zoom when it changes
-                scope.$watch("zoom", function(newValue, oldValue) {
-                    if (newValue === oldValue || dragging) {
-                        return;
-                    }
-
-                    _m.setZoom(newValue);
-                }, true);
-
-                // Update zoom controls visibility when model changes
-                scope.$watch('zoomControls', function(newValue, oldValue) {
-                    if (newValue == oldValue) {
-                        return;
-                    }
-
-                    if (newValue) {
-                        _zoom.show();
-                    } else {
-                        _zoom.hide();
-                    }
-                });
-
-                // Update fulscreen control visibility when model changes
-                scope.$watch('fullscreenControls', function(newValue, oldValue) {
-                    if (newValue == oldValue) {
-                        return;
-                    }
-
-                    if (newValue) {
-                        _m.fullscreen.enable();
-                    } else {
-                        _m.fullscreen.disable();
-                    }
-                });
-
-//                scope.$watch('markers', function(markers) {
-//                    if(dragging) {
-//                        return;
-//                    }
+//					scope.$watch('markers', function(markers) {
+//						if(dragging) {
+//							return;
+//						}
 //
-//                    if(markers) {
-//                        _m.markers.removeAll();
-//                        angular.forEach(scope.markers, function(markerConfig) {
-//                            scope.addMarker(markerConfig);
-//                        });
+//						if(markers) {
+//							_m.markers.removeAll();
+//							angular.forEach(scope.markers, function(markerConfig) {
+//								scope.addMarker(markerConfig);
+//							});
 //
-//                        if(scope.fitToMarkers) {
-//                            var markersBounds = _m.markers.getBounds();
-//                            _m.setBounds(markersBounds);
-//                        }
-//                    }
-//                }, true);
+//							if(scope.fitToMarkers) {
+//								var markersBounds = _m.markers.getBounds();
+//								_m.setBounds(markersBounds);
+//							}
+//						}
+//					}, true);
 
-                // Update model properties on map events
-                _m.addEventListener(_m.getContainerId(), 'DgZoomChange', function(evt) {
-                    if (!$rootScope.$root.$$phase) {
-                        scope.$apply(function() {
-                            scope.zoom = evt.getZoom();
-                        });
-                    } else {
-                        scope.zoom = evt.getZoom();
-                    }
-                });
+					// Update model properties on map events
+					_m.on('zoomend', function(evt){
+						if (!$rootScope.$root.$$phase) {
+							scope.$apply(function() {
+								scope.zoom = evt.target.getZoom();
+							});
+						} else {
+							scope.zoom = evt.target.getZoom();
+						}
+					});
 
-                _m.addEventListener(_m.getContainerId(), 'DgMapMove', function(evt) {
-                    var pos = evt.getCenter();
-                    if(pos) {
-                        if (!$rootScope.$root.$$phase) {
-                            scope.$apply(function() {
-                                scope.latitude = pos.lat;
-                                scope.longitude = pos.lon;
-                            });
-                        } else {
-                            scope.latitude = pos.lat;
-                            scope.longitude = pos.lon;
-                        }
-                    }
-                });
+					_m.on('drag', function(evt) {
+						var pos = evt.target.getCenter();
+						if(pos) {
+							if (!$rootScope.$root.$$phase) {
+								scope.$apply(function() {
+									scope.latitude = pos.lat;
+									scope.longitude = pos.lng;
+								});
+							} else {
+								scope.latitude = pos.lat;
+								scope.longitude = pos.lng;
+							}
+						}
+					});
 
-                _m.addEventListener(_m.getContainerId(), 'DgDragStart', function() {
-                    dragging = true;
-                });
+					_m.on('dragstart', function() {
+						dragging = true;
+					});
 
-                _m.addEventListener(_m.getContainerId(), 'DgDragStop', function() {
-                    dragging = false;
-                });
-            }
-        };
+					_m.on('dragend', function() {
+						dragging = false;
+					});
+					
+				});
+			}
+		};
 
-    }]);
+	}]);
 
-    dgMapsModule.directive("dgMarker", ["$log", function($log) {
-        return {
-            restrict: "E",
-            require: "^dgMap",
-            scope: {
-                lon: "=longitude",
-                lat: "=latitude",
-                dgClick: '&ngClick',
-                show: '=',
-                hint: '=',
-                dragStop: '&',
-                dragStart: '&'
-            },
-            link: function(scope, element, attrs, dgMapCtrl) {
-                var markerConfig = {
-                    geoPoint: new DG.GeoPoint(scope.lon, scope.lat),
-                    draggable: !!attrs.draggable,
-                    hint: attrs.hint,
-                    dragStartCallback: function() {
-                        scope.dragStart();
-                    },
-                    dragStopCallback: function() {
-                        // Update properties on scope
-                        var pos = marker.getPosition();
-                        if(pos) {
-                            scope.$apply(function() {
-                                scope.lon = pos.lon;
-                                scope.lat = pos.lat;
-                            });
-                        }
+	dgMapsModule.directive("dgMarker", ["$log", function($log) {
+		return {
+			restrict: "E",
+			require: "^dgMap",
+			scope: {
+				lon: "=longitude",
+				lat: "=latitude",
+				draggable: '=',
+				dgClick: '&ngClick',
+				alt: '=',
+				show: '=',
+				hint: '=',
+				icon: "=",
+				dragStop: '&',
+				dragStart: '&'
+			},
+			link: function(scope, element, attrs, dgMapCtrl) {
+				
+				var markerConfig = {
+					draggable: !!attrs.draggable,
+					title: attrs.hint
+				};
 
-                        // Call event handler
-                        scope.dragStop();
-                    }
-                };
+				if (angular.isDefined(scope.alt)) {
+					angular.extend(markerConfig, {alt: scope.alt});
+				}
 
-                if(angular.isDefined(attrs.ngClick)) {
-                    angular.extend(markerConfig, {
-                        clickCallback: function() {
-                            scope.dgClick();
-                        }
-                    });
-                }
+				var marker = new DG.marker([scope.lat, scope.lon], markerConfig);
 
-                if(attrs.iconSrc) {
-                    if(angular.isDefined(attrs.iconWidth) && angular.isDefined(attrs.iconHeight)) {
-                        var icon = new DG.Icon(attrs.iconSrc, new DG.Size(parseInt(attrs.iconWidth, 10), parseInt(attrs.iconHeight, 10)));
-                        angular.extend(markerConfig, { icon: icon });
-                        //marker.setIcon(icon);
-                    } else {
-                        $log.error("angular-dg-marker: icon width and height should be specified");
-                    }
-                }
+				if (angular.isDefined(scope.popup) && scope.popup) {
+					marker.bindPopup(scope.popup);
+				}
+				
+				if(angular.isDefined(attrs.ngClick)) {
+					marker.on('click', function(evt){
+						var cb = scope.dgClick() || angular.noop;
+						cb(evt);
+					});
+				}
 
-                var marker = new DG.Markers.Common(markerConfig);
-                dgMapCtrl.addMarker(marker);
+				marker.on('dragstart', function (evt) {
+					var pos = marker.getLatLng();
+					
+					scope.$apply(function() {
+						scope.lat  = pos.lat;
+						scope.lon = pos.lng;
+					});
+					
+					var cb = scope.dragStart() || angular.noop;
+					cb.call(marker, evt);
+				});
 
-                // Watch for marker's position on scope and update DG.Marker when needed
-                scope.$watch('lon', function(lon) {
-                    if(!angular.isDefined(lon)) {
-                        return;
-                    }
+				marker.on('dragend', function (evt) {
+					var pos = marker.getLatLng();
+					
+					scope.$apply(function() {
+						scope.lat  = pos.lat;
+						scope.lon = pos.lng;
+					});
+					
+					var cb = scope.dragStop() || angular.noop;
+					cb.call(marker, evt);
+				});
 
-                    var pos = marker.getPosition();
-                    pos.lon = lon;
-                    marker.setPosition(pos);
-                });
+				if(attrs.iconSrc) {
+					if(angular.isDefined(attrs.iconWidth) && angular.isDefined(attrs.iconHeight)) {
+						var icon = new DG.Icon({
+							iconUrl: attrs.iconSrc,
+							iconSize: [
+								parseInt(attrs.iconWidth, 10), 
+								parseInt(attrs.iconHeight, 10)
+							]
+						});
+						marker.setIcon(icon);
+					} else {
+						$log.error("angular-dg-marker: icon width and height should be specified");
+					}
+				}
 
-                scope.$watch('lat', function(lat) {
-                    if(!angular.isDefined(lat)) {
-                        return;
-                    }
+				dgMapCtrl.addMarker(marker);
 
-                    var pos = marker.getPosition();
-                    pos.lat = lat;
-                    marker.setPosition(pos);
-                });
+				// Watch for marker's position on scope and update DG.Marker when needed
+				scope.$watch('lon', function(lon) {
+					if(!angular.isDefined(lon)) {
+						return;
+					}
+					
+					var pos = marker.getLatLng();
+					pos.lng = lon;
+					marker.setLatLng(pos);
+				});
 
-                scope.$watch('show', function(show) {
-                    if(!angular.isDefined(show)) {
-                        return;
-                    }
+				scope.$watch('lat', function(lat) {
+					if(!angular.isDefined(lat)) {
+						return;
+					}
 
-                    if(show) {
-                        marker.show();
-                    } else {
-                        marker.hide();
-                    }
-                });
+					var pos = marker.getLatLng();
+					pos.lat = lat;
+					marker.setLatLng(pos);
+				});
 
-                scope.$watch('hint', function(hint) {
-                    if(!angular.isDefined(hint)) {
-                        return;
-                    }
+				scope.$watch('hint', function(hint) {
+					if(!angular.isDefined(hint)) {
+						return;
+					}
 
-                    marker.setHintContent(hint);
-                });
+					marker.bindLabel(hint);
+				});
 
-                scope.$watch('draggable', function(draggable) {
-                    if(!angular.isDefined(draggable)) {
-                        return;
-                    }
+				scope.$watch('draggable', function(draggable) {
+					if(!angular.isDefined(draggable)) {
+						return;
+					}
 
-                    if(draggable) {
-                        marker.enableDraggable();
-                    } else {
-                        marker.disableDraggable();
-                    }
-                });
+					if(marker.dragging){
+						marker.dragging[(draggable ? 'enable' : 'disable')]();
+					}
 
-                element.bind('$destroy', function() {
-                    dgMapCtrl.removeMarker(marker);
-                });
-            }
-        };
-    }]);
+				});
 
-    dgMapsModule.directive('dgStaticMap', ['$log', function($log) {
-        return {
-            restrict: "E",
-            transclude: true,
-            template: "<img class='angular-dg-static-map' ng-src='{{ mapSrc }}'><dg-static-markers ng-transclude></dg-static-markers>",
-            //replace: true,
-            scope: {
-                latitude: "=", // required
-                longitude: "=", // required
-                zoom: "=", // required
-                width: "=", //required
-                height: "=" // required
-            },
-            controller: ['$scope', function($scope) {
-                $scope.markers = [];
+				element.bind('$destroy', function() {
+					dgMapCtrl.removeMarker(marker);
+				});
+			}
+		};
+	}]);
 
-                /**
-                 * Add marker to static map
-                 * @param {Object} markerConfig
-                 */
-                this.addMarker = function(markerConfig) {
-                    $scope.markers.push(markerConfig);
-                };
-
-                this.removeMarker = function(markerConfig) {
-                    angular.forEach($scope.markers, function(marker, ind) {
-                        if(marker === markerConfig) {
-                            $scope.markers.splice(ind, 1);
-                        }
-                    });
-                };
-            }],
-            link: function(scope, element, attrs) {
-                if(!angular.isDefined(scope.latitude)) {
-                    $log.error("angular-dg-static-maps: map latitude property not set");
-                    return;
-                }
-
-                if(!angular.isDefined(scope.longitude)) {
-                    $log.error("angular-dg-static-maps: map longitude property not set");
-                    return;
-                }
-
-                if(!angular.isDefined(scope.markers) && !angular.isDefined(scope.zoom)) {
-                    $log.error("angular-dg-static-maps: map zoom property not set");
-                    return;
-                }
-
-                if(!angular.isDefined(scope.width) || !angular.isDefined(scope.height)) {
-                    $log.error("angular-dg-static-maps: width and height properties should be set");
-                    return;
-                }
-
-                angular.element(element).addClass("angular-dg-static-map");
-
-                var src = 'http://static.maps.api.2gis.ru/1.0?';
-                src += 'center=' + scope.longitude + ',' + scope.latitude;
-                src += '&zoom=' + scope.zoom;
-                src += '&size=' + scope.width + ',' + scope.height;
-
-                if(angular.isDefined(scope.markers) && angular.isArray(scope.markers) && scope.markers.length) {
-                    var tmpMarkers = [];
-                    angular.forEach(scope.markers, function(marker) {
-                        tmpMarkers.push(marker.lon + ',' + marker.lat + (marker.hint ? (',' + marker.hint) : ''));
-                    });
-
-                    src += '&markers=' + tmpMarkers.join('~');
-                }
-
-                scope.mapSrc = src;
-            }
-        };
-    }]);
-
-    dgMapsModule.directive('dgStaticMarker', ['$log', function($log) {
-        return {
-            restrict: 'E',
-            priority: 100,
-            require: '^dgStaticMap',
-            link: function(scope, element, attrs, ctrl) {
-                if('hint' in attrs && (!angular.isNumber(parseInt(attrs.hint, 10)) || parseInt(attrs.hint, 10) != attrs.hint)) {
-                        $log.error('angular-dg-static-marker: hint should be a number');
-                    return;
-                }
-
-                ctrl.addMarker({
-                    lon: attrs.longitude,
-                    lat: attrs.latitude,
-                    hint: parseInt(attrs.hint, 10)
-                });
-            }
-        };
-    }]);
-
-    dgMapsModule.service('geocoder', function() {
-        return {
-            get: function(query, options) {
-                return DG.Geocoder.get(query, options);
-            }
-        };
-    });
+	dgMapsModule.service('geocoder', function() {
+		return {
+			get: function(data, success, error) {
+				angular.extend(data, {type: 'geo'});
+				DG.ajax('//catalog.api.2gis.ru/2.0/search', {
+					data: data,
+					success: (success || angular.noop),
+					error: (error || angular.noop)
+				});
+			}
+		};
+	});
 })();
