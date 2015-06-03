@@ -278,7 +278,7 @@
 				
 				if(angular.isDefined(attrs.ngClick)) {
 					marker.on('click', function(evt){
-						var cb = scope.dgClick() || angular.noop;
+						var cb = scope.dgClick || angular.noop;
 						cb(evt);
 					});
 				}
@@ -291,7 +291,7 @@
 						scope.lon = pos.lng;
 					});
 					
-					var cb = scope.dragStart() || angular.noop;
+					var cb = scope.dragStart || angular.noop;
 					cb.call(marker, evt);
 				});
 
@@ -303,7 +303,7 @@
 						scope.lon = pos.lng;
 					});
 					
-					var cb = scope.dragStop() || angular.noop;
+					var cb = scope.dragStop || angular.noop;
 					cb.call(marker, evt);
 				});
 
